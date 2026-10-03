@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  
+  <!-- AIRTIGHT CONTENT SECURITY POLICY WITH SECURE MEDIA STREAMING -->
+  <meta http-equiv="Content-Security-Policy" 
+        content="default-src 'self'; 
+                 img-src 'self' https://images.unsplash.com data:; 
+                 media-src 'self' https://commondatastorage.googleapis.com data: blob:; 
+                 style-src 'unsafe-inline'; 
+                 script-src 'unsafe-inline';" />
+
+  <title>Happy Birthday, Day Mor!</title>
+  
+  <style>
+    :root {
+      --bg-radial: radial-gradient(circle at 50% 15%, #fff1f2 0%, #fce7f3 50%, #fbcfe8 100%);
+      --accent-rose: #e11d48;
+      --accent-pink: #f43f5e;
+      --card-bg: rgba(255, 255, 255, 0.8);
+      --card-border: rgba(255, 255, 255, 0.95);
+      --text-primary: #881337;
+      --text-secondary: #9f1239;
+      --audio-pulse: 1;
+      --glow-soft: drop-shadow(0 12px 24px rgba(244, 63, 94, 0.28));
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg-radial);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Georgia", serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      perspective: 1200px;
+    }
+
+    #visual-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* TOP SPA VIEW NAVIGATION SWITCHER (DOUBLE-PAGE CONTROLLER) */
+    .spa-nav-switcher {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 0.35rem 0.5rem;
+      border-radius: 9999px;
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 4px 16px rgba(244, 63, 94, 0.15);
+      margin-bottom: 1rem;
+    }
+
+    .nav-tab {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.5rem 1.2rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.25s ease;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .nav-tab.active-tab {
+      background: linear-gradient(135deg, #e11d48, #fb7185);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
+    }
+
+    /* MAIN STAGE / VIEW CONTAINERS */
+    .view-container {
+      position: relative;
+      z-index: 2;
+      width: min(92vw, 470px);
+      display: none;
+      animation: fadeInView 0.4s ease-out forwards;
+    }
+
+    .view-container.active-view {
+      display: block;
+    }
+
+    @keyframes fadeInView {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* =========================================================================
+     * PAGE 1: FLORAL GREETING CARD STYLES
+     * ========================================================================= */
+    .card-scene {
+      position: relative;
+      width: 100%;
+      height: 610px;
+      perspective: 1200px;
+    }
+
+    .fsm-card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.8s cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+
+    .fsm-card.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      background: var(--card-bg);
+      border: 1.5px solid var(--card-border);
+      border-radius: 32px;
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      box-shadow: 0 25px 60px -15px rgba(244, 63, 94, 0.22);
+      padding: 1.8rem 1.6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+    }
+
+    .card-face.back {
+      transform: rotateY(180deg);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    /* PHOTO MEDALLION */
+    .medallion-container {
+      position: relative;
+      width: 165px;
+      height: 165px;
+      margin: 0 auto;
+      cursor: pointer;
+      transform: scale(var(--audio-pulse));
+      transition: transform 0.08s ease-out;
+    }
+
+    .floral-svg-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+      filter: var(--glow-soft);
+      animation: rotateHalo 30s linear infinite;
+    }
+
+    @keyframes rotateHalo {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .photo-viewport {
+      position: absolute;
+      top: 17.5px;
+      left: 17.5px;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      overflow: hidden;
+      z-index: 2;
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.2);
+      border: 3px solid #fff;
+    }
+
+    .photo-viewport img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.4s ease;
+    }
+
+    .memory-badge {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent-rose);
+      background: rgba(255, 228, 230, 0.85);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-weight: 700;
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--accent-rose);
+      font-weight: 700;
+    }
+
+    h1.celebrant-name {
+      font-size: 1.7rem;
+      color: var(--text-primary);
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .divider {
+      width: 50px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-pink), transparent);
+    }
+
+    p.personalized-message {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+      width: 100%;
+    }
+
+    .btn-action {
+      appearance: none;
+      background: #ffffff;
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 0.7rem 0.4rem;
+      border-radius: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      box-shadow: 0 4px 12px rgba(244, 63, 94, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(244, 63, 94, 0.2);
+      border-color: var(--accent-pink);
+    }
+
+    .btn-action:active {
+      transform: translateY(1px);
+    }
+
+    .btn-action.primary-btn {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #e11d48 0%, #fb7185 100%);
+      color: #ffffff;
+      border: none;
+      font-size: 0.88rem;
+      padding: 0.8rem 1rem;
+    }
+
+    /* PHYSICAL CANDLE */
+    .candle-stage {
+      position: relative;
+      width: 80px;
+      height: 110px;
+      margin: 0 auto;
+      cursor: pointer;
+    }
+
+    .candle-body {
+      position: absolute;
+      bottom: 0;
+      left: 28px;
+      width: 24px;
+      height: 65px;
+      background: linear-gradient(180deg, #fbcfe8, #f43f5e);
+      border-radius: 6px 6px 4px 4px;
+    }
+
+    .candle-wick {
+      position: absolute;
+      top: 38px;
+      left: 38px;
+      width: 4px;
+      height: 10px;
+      background: #475569;
+    }
+
+    .candle-flame {
+      position: absolute;
+      top: 14px;
+      left: 32px;
+      width: 16px;
+      height: 26px;
+      background: radial-gradient(circle at 50% 80%, #fef08a 0%, #f59e0b 60%, #ef4444 100%);
+      border-radius: 50% 50% 35% 35% / 80% 80% 30% 30%;
+      filter: drop-shadow(0 0 10px #f59e0b);
+      transform-origin: center bottom;
+      animation: flickerFlame 1.2s infinite alternate ease-in-out;
+      transition: opacity 0.4s ease, transform 0.3s ease;
+    }
+
+    .candle-flame.extinguished {
+      opacity: 0;
+      transform: scale(0.1);
+    }
+
+    @keyframes flickerFlame {
+      0% { transform: scale(1) rotate(-2deg); }
+      100% { transform: scale(0.95, 1.05) rotate(2deg); }
+    }
+
+    .wish-box {
+      background: rgba(255, 241, 242, 0.85);
+      border: 1px dashed var(--accent-pink);
+      border-radius: 20px;
+      padding: 1.2rem;
+      margin: 0.8rem 0;
+      width: 100%;
+    }
+
+    .btn-return {
+      appearance: none;
+      background: transparent;
+      border: 1.5px solid var(--accent-pink);
+      color: var(--accent-rose);
+      padding: 0.7rem 1.6rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* =========================================================================
+     * PAGE 2: VIDEO TRIBUTE THEATER STYLES
+     * ========================================================================= */
+    .video-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--card-border);
+      border-radius: 32px;
+      backdrop-filter: blur(28px) saturate(180%);
+      box-shadow: 0 25px 60px -15px rgba(244, 63, 94, 0.22);
+      padding: 2rem 1.6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1.2rem;
+    }
+
+    .video-player-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #0f172a;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .video-player-frame video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .video-caption-note {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      font-style: italic;
+      background: rgba(255, 241, 242, 0.7);
+      padding: 1rem 1.2rem;
+      border-radius: 16px;
+      border-left: 3px solid var(--accent-rose);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="visual-canvas"></canvas>
+
+  <!-- TOP SPA DOUBLE-PAGE SWITCHER -->
+  <nav class="spa-nav-switcher">
+    <button class="nav-tab active-tab" id="tab-greeting">
+      💌 Greeting Card
+    </button>
+    <button class="nav-tab" id="tab-video">
+      🎬 Video Gallery
+    </button>
+  </nav>
+
+  <!-- PAGE 1: GREETING CARD -->
+  <main class="view-container active-view" id="view-greeting">
+    <div class="card-scene">
+      <div class="fsm-card" id="interactive-card">
+        
+        <!-- FRONT -->
+        <div class="card-face front">
+          <div class="medallion-container" id="photo-frame-trigger" title="Click to view next photo!">
+            <div class="photo-viewport">
+              <img id="celebrant-photo" src="" alt="Celebrant Photo" />
+            </div>
+            <svg class="floral-svg-frame" viewBox="0 0 200 200" fill="none">
+              <defs>
+                <linearGradient id="goldPetal" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#fcd34d"/>
+                  <stop offset="50%" stop-color="#f43f5e"/>
+                  <stop offset="100%" stop-color="#e11d48"/>
+                </linearGradient>
+              </defs>
+              <circle cx="100" cy="100" r="82" stroke="url(#goldPetal)" stroke-width="2.5" stroke-dasharray="6 8"/>
+              <circle cx="100" cy="18" r="6" fill="#f43f5e"/>
+              <circle cx="182" cy="100" r="6" fill="#f43f5e"/>
+              <circle cx="100" cy="182" r="6" fill="#f43f5e"/>
+              <circle cx="18" cy="100" r="6" fill="#f43f5e"/>
+              <circle cx="42" cy="42" r="4.5" fill="#fcd34d"/>
+              <circle cx="158" cy="42" r="4.5" fill="#fcd34d"/>
+              <circle cx="158" cy="158" r="4.5" fill="#fcd34d"/>
+              <circle cx="42" cy="158" r="4.5" fill="#fcd34d"/>
+            </svg>
+          </div>
+
+          <div class="memory-badge" id="photo-caption">Loading memory...</div>
+
+          <div>
+            <div class="tagline" id="tag-text">DEAREST DAUGHTER IN LAW</div>
+            <h1 class="celebrant-name" id="name-text">Happy Birthday, DAY AMOR!</h1>
+          </div>
+
+          <div class="divider"></div>
+
+          <p class="personalized-message" id="message-text">
+            "Malipayong Adlawng natawhan sa akong kinakusgan nga daughter-in-law, hinaut unta nga ikaw magmalipayon sa imong adlawng natawhan. More birthdays to come, good health ug God Bless."
+          </p>
+
+          <div class="controls-grid">
+            <button class="btn-action primary-btn" id="btn-shower">
+              🌸 Bloom Petals
+            </button>
+            <button class="btn-action" id="btn-next-photo">
+              📷 Next Photo
+            </button>
+            <button class="btn-action" id="btn-music">
+              🎵 Play Melody
+            </button>
+            <button class="btn-action" style="grid-column: span 2;" id="btn-flip-wish">
+              ✨ Make a Wish
+            </button>
+          </div>
+        </div>
+
+        <!-- BACK (CANDLE) -->
+        <div class="card-face back">
+          <h2 style="font-size: 1.4rem; color: var(--accent-rose); font-weight: 800;">Make a Wish & Blow Your Candle!</h2>
+          
+          <div class="candle-stage" id="candle-trigger" title="Huyopa sa mic o i-klik para mapalong!">
+            <div class="candle-flame" id="candle-flame"></div>
+            <div class="candle-wick"></div>
+            <div class="candle-body"></div>
+          </div>
+
+          <div id="blow-status-text" style="font-size: 0.82rem; color: var(--accent-rose); font-weight: 700;">
+            💨 Huyopa ang mic sa phone o pislita ang kandila!
+          </div>
+
+          <div class="wish-box">
+            <p id="wish-quote-display" style="font-size: 0.95rem; line-height: 1.6; font-style: italic;">
+              "Hinaut pa unta nga ikaw hatagan pa ug dugang nga katuigan sa imong kinabuhi ug unta ikaw magmalipayon karong adlawa."
+            </p>
+          </div>
+
+          <button class="btn-return" id="btn-return">
+            ← Return to Greeting Card
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- PAGE 2: VIDEO TRIBUTE THEATER -->
+  <section class="view-container" id="view-video">
+    <div class="video-card">
+      <div>
+        <div class="tagline">VIDEO GALLERY</div>
+        <h2 style="font-size: 1.5rem; color: var(--accent-rose); font-weight: 800; margin-top: 0.3rem;">
+          Video
+        </h2>
+      </div>
+
+      <div class="video-player-frame">
+        <video id="birthday-video" controls playsinline preload="metadata">
+          <source src="videos/greetings.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <div class="video-caption-note" id="video-dedication">
+        "Happy Birthday! Day Mor!"
+      </div>
+
+      <button class="btn-action primary-btn" id="btn-celebrate-video" style="width: 100%;">
+        🌸 Celebration Fireworks
+      </button>
+    </div>
+  </section>
+
+  <script>
+    /* =========================================================================
+     * IN-ENGINE CONFIGURATION DATA
+     * ========================================================================= */
+    const CONFIG = {
+      relationshipTag: "DEAREST DAUGHTER IN LAW",
+      celebrantName: "DAY AMOR",
+      message: 
+        "Malipayong Adlawng natawhan sa akong kinakusgan nga daughter-in-law, hinaut unta nga ikaw magmalipayon sa imong adlawng natawhan. More birthdays to come, good health ug God Bless.",
+      photoGallery: [
+        {
+          url: "images/amor1.jpg",
+          caption: "Photo 1: Blessed with Another Year"
+        },
+        {
+          url: "images/amor2.jpg",
+          caption: "Photo 2: Grace, Elegance & Joy"
+        },
+        {
+          url: "images/amor3.jpg",
+          caption: "Photo 3: Always Radiant & Smiling"
+        }
+      ],
+      wishesArray: [
+        "May every step you take this year be guided by grace, wrapped in good health, and surrounded by family.",
+        "Wishing you continuous peace of mind, laughter that fills your days, and boundless blessings!",
+        "May your year ahead be as sweet, generous, and bright as the light you bring to all of us."
+      ]
+    };
+
+    /* INGEST CONFIG */
+    document.getElementById("tag-text").textContent = CONFIG.relationshipTag;
+    document.getElementById("name-text").textContent = `Happy Birthday, ${CONFIG.celebrantName}!`;
+    document.getElementById("message-text").textContent = `"${CONFIG.message}"`;
+
+    /* =========================================================================
+     * LIVELY PROCEDURAL MICRO-ACOUSTIC TACTILE FX ENGINE (WEB AUDIO API)
+     * ========================================================================= */
+    class TactileAudioFX {
+      constructor() {
+        this.ctx = null;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContextClass();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      // 1. Bouncy Bubble Pop (Jolly, bubbly tactile click)
+      playBubblePop() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = "sine";
+        // Frequency sweep up
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(780, now + 0.05);
+
+        // Crisp popping envelope
+        gain.gain.setValueAtTime(0.35, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.07);
+      }
+
+      // 2. Joyful Sparkle Chime (Lively pentatonic arpeggio for celebration)
+      playSparkleChime() {
+        this.init();
+        const now = this.ctx.currentTime;
+        // Pentatonic chord: E5, G#5, B5, E6
+        const freqs = [659.25, 830.61, 987.77, 1318.51];
+
+        freqs.forEach((f, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const t = now + (idx * 0.035);
+
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(f, t);
+
+          gain.gain.setValueAtTime(0.001, t);
+          gain.gain.exponentialRampToValueAtTime(0.28, t + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(t);
+          osc.stop(t + 0.4);
+        });
+      }
+
+      // 3. Magical Shimmer Swell (Wish mode transition)
+      playMagicShimmer() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const chords = [523.25, 659.25, 783.99, 1046.50]; // C Major chord
+
+        chords.forEach((f) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(f, now);
+
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.exponentialRampToValueAtTime(0.18, now + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + 0.65);
+        });
+      }
+
+      // 4. Celebration Fanfare Trill (When candle is blown)
+      playCelebrationFanfare() {
+        this.init();
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        notes.forEach((f, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          const t = now + (idx * 0.05);
+
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(f, t);
+
+          gain.gain.setValueAtTime(0.001, t);
+          gain.gain.exponentialRampToValueAtTime(0.3, t + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+
+          osc.start(t);
+          osc.stop(t + 0.55);
+        });
+      }
+    }
+
+    const sfxEngine = new TactileAudioFX();
+
+    /* =========================================================================
+     * SPA DOUBLE-PAGE VIEW CONTROLLER
+     * ========================================================================= */
+    const tabGreeting = document.getElementById("tab-greeting");
+    const tabVideo = document.getElementById("tab-video");
+    const viewGreeting = document.getElementById("view-greeting");
+    const viewVideo = document.getElementById("view-video");
+    const videoEl = document.getElementById("birthday-video");
+
+    function switchView(target) {
+      sfxEngine.playBubblePop();
+      if (target === 'greeting') {
+        tabGreeting.classList.add("active-tab");
+        tabVideo.classList.remove("active-tab");
+        viewGreeting.classList.add("active-view");
+        viewVideo.classList.remove("active-view");
+      } else {
+        tabVideo.classList.add("active-tab");
+        tabGreeting.classList.remove("active-tab");
+        viewVideo.classList.add("active-view");
+        viewGreeting.classList.remove("active-view");
+      }
+    }
+
+    tabGreeting.addEventListener("click", () => switchView('greeting'));
+    tabVideo.addEventListener("click", () => switchView('video'));
+
+    videoEl.addEventListener("play", () => {
+      audioEngine.stop();
+    });
+
+    /* =========================================================================
+     * FAST FOURIER TRANSFORM (FFT) & POLYPHONIC AUDIO ENGINE
+     * ========================================================================= */
+    class ReactiveAudioEngine {
+      constructor() {
+        this.ctx = null;
+        this.analyser = null;
+        this.dataArray = null;
+        this.isPlaying = false;
+        this.activeOscillators = [];
+        
+        const C4 = 261.63, D4 = 293.66, E4 = 329.63, F4 = 349.23,
+              G4 = 392.00, A4 = 440.00, B4 = 493.88, C5 = 523.25, D5 = 587.33;
+
+        this.score = [
+          { f: G4, d: 0.3 }, { f: G4, d: 0.3 }, { f: A4, d: 0.6 }, { f: G4, d: 0.6 }, { f: C5, d: 0.6 }, { f: B4, d: 1.2 },
+          { f: G4, d: 0.3 }, { f: G4, d: 0.3 }, { f: A4, d: 0.6 }, { f: G4, d: 0.6 }, { f: D5, d: 0.6 }, { f: C5, d: 1.2 },
+          { f: G4, d: 0.3 }, { f: G4, d: 0.3 }, { f: G4*2, d: 0.6 }, { f: E4*2, d: 0.6 }, { f: C5, d: 0.6 }, { f: B4, d: 0.6 }, { f: A4, d: 0.9 },
+          { f: F4*2, d: 0.3 }, { f: F4*2, d: 0.3 }, { f: E4*2, d: 0.6 }, { f: C5, d: 0.6 }, { f: D5, d: 0.6 }, { f: C5, d: 1.4 }
+        ];
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContextClass();
+          this.analyser = this.ctx.createAnalyser();
+          this.analyser.fftSize = 64;
+          this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+          this.startVisualizerLoop();
+        }
+      }
+
+      startVisualizerLoop() {
+        const updateAura = () => {
+          if (this.analyser && this.isPlaying) {
+            this.analyser.getByteFrequencyData(this.dataArray);
+            let sum = 0;
+            for (let i = 0; i < 8; i++) sum += this.dataArray[i];
+            const avg = sum / 8;
+            const scale = 1 + (avg / 255) * 0.12;
+            document.documentElement.style.setProperty("--audio-pulse", scale.toFixed(3));
+          } else {
+            document.documentElement.style.setProperty("--audio-pulse", "1");
+          }
+          requestAnimationFrame(updateAura);
+        };
+        requestAnimationFrame(updateAura);
+      }
+
+      playFullSong() {
+        this.init();
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        this.stop();
+
+        this.isPlaying = true;
+        let currentTime = this.ctx.currentTime + 0.05;
+
+        this.score.forEach((note) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(note.f, currentTime);
+
+          gain.gain.setValueAtTime(0.0001, currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.3, currentTime + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, currentTime + note.d * 0.95);
+
+          osc.connect(gain);
+          gain.connect(this.analyser);
+          this.analyser.connect(this.ctx.destination);
+
+          osc.start(currentTime);
+          osc.stop(currentTime + note.d);
+
+          this.activeOscillators.push(osc);
+          currentTime += note.d * 0.85;
+        });
+
+        setTimeout(() => { this.isPlaying = false; }, (currentTime - this.ctx.currentTime) * 1000);
+      }
+
+      stop() {
+        this.activeOscillators.forEach(osc => {
+          try { osc.stop(); } catch(e) {}
+        });
+        this.activeOscillators = [];
+        this.isPlaying = false;
+      }
+    }
+
+    /* =========================================================================
+     * PARTICLE & HEART-FIREWORK KINEMATICS ENGINE
+     * ========================================================================= */
+    class HybridParticleEngine {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext("2d");
+        this.petals = [];
+        this.sparks = [];
+        this.smokes = [];
+        this.animId = null;
+        this.resize();
+        window.addEventListener("resize", () => this.resize());
+      }
+
+      resize() {
+        this.canvas.width = window.innerWidth * window.devicePixelRatio;
+        this.canvas.height = window.innerHeight * window.devicePixelRatio;
+        this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      }
+
+      spawnPetals(count) {
+        for (let i = 0; i < count; i++) {
+          this.petals.push({
+            x: Math.random() * window.innerWidth,
+            y: -20 - (Math.random() * window.innerHeight * 0.4),
+            size: Math.random() * 8 + 6,
+            color: ["#fb7185", "#f43f5e", "#fda4af", "#ffe4e6"][Math.floor(Math.random() * 4)],
+            vy: Math.random() * 1.8 + 1.2,
+            swayAmp: Math.random() * 2.5 + 1.2,
+            swaySpeed: Math.random() * 0.03 + 0.015,
+            swayAngle: Math.random() * Math.PI * 2,
+            rotation: Math.random() * 360,
+            vRot: (Math.random() - 0.5) * 1.8
+          });
+        }
+        this.startLoop();
+      }
+
+      spawnHeartFireworks(centerX, centerY) {
+        const count = 90;
+        for (let i = 0; i < count; i++) {
+          const t = (Math.PI * 2 * i) / count;
+          const hx = 16 * Math.pow(Math.sin(t), 3);
+          const hy = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+          const speed = Math.random() * 0.35 + 0.35;
+
+          this.sparks.push({
+            x: centerX,
+            y: centerY,
+            vx: hx * speed,
+            vy: hy * speed,
+            alpha: 1.0,
+            decay: Math.random() * 0.012 + 0.01,
+            color: ["#f43f5e", "#fda4af", "#f59e0b", "#fff"][Math.floor(Math.random() * 4)],
+            size: Math.random() * 3.5 + 2
+          });
+        }
+        this.startLoop();
+      }
+
+      spawnSmoke(originX, originY) {
+        for (let i = 0; i < 25; i++) {
+          this.smokes.push({
+            x: originX + (Math.random() - 0.5) * 8,
+            y: originY,
+            vx: (Math.random() - 0.5) * 1.2,
+            vy: -(Math.random() * 2 + 1),
+            radius: Math.random() * 4 + 3,
+            alpha: 0.7,
+            decay: Math.random() * 0.012 + 0.008
+          });
+        }
+        this.startLoop();
+      }
+
+      spawnPointerDust(x, y) {
+        for (let i = 0; i < 2; i++) {
+          this.sparks.push({
+            x: x + (Math.random() - 0.5) * 12,
+            y: y + (Math.random() - 0.5) * 12,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: (Math.random() - 0.5) * 1.5 - 0.5,
+            alpha: 0.8,
+            decay: 0.035,
+            color: "#fb7185",
+            size: Math.random() * 2.5 + 1
+          });
+        }
+        this.startLoop();
+      }
+
+      startLoop() {
+        if (!this.animId) this.render();
+      }
+
+      render() {
+        this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+        // Petals
+        for (let i = this.petals.length - 1; i >= 0; i--) {
+          const p = this.petals[i];
+          p.swayAngle += p.swaySpeed;
+          p.x += Math.sin(p.swayAngle) * p.swayAmp;
+          p.y += p.vy;
+          p.rotation += p.vRot;
+
+          if (p.y > window.innerHeight + 30) {
+            this.petals.splice(i, 1);
+            continue;
+          }
+
+          this.ctx.save();
+          this.ctx.translate(p.x, p.y);
+          this.ctx.rotate((p.rotation * Math.PI) / 180);
+          this.ctx.fillStyle = p.color;
+          this.ctx.beginPath();
+          this.ctx.ellipse(0, 0, p.size, p.size * 0.65, Math.PI / 4, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.restore();
+        }
+
+        // Sparks
+        for (let i = this.sparks.length - 1; i >= 0; i--) {
+          const s = this.sparks[i];
+          s.x += s.vx;
+          s.y += s.vy;
+          s.vx *= 0.97;
+          s.vy *= 0.97;
+          s.alpha -= s.decay;
+
+          if (s.alpha <= 0) {
+            this.sparks.splice(i, 1);
+            continue;
+          }
+
+          this.ctx.save();
+          this.ctx.globalAlpha = s.alpha;
+          this.ctx.fillStyle = s.color;
+          this.ctx.beginPath();
+          this.ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.restore();
+        }
+
+        // Smokes
+        for (let i = this.smokes.length - 1; i >= 0; i--) {
+          const sm = this.smokes[i];
+          sm.x += sm.vx;
+          sm.y += sm.vy;
+          sm.radius += 0.15;
+          sm.alpha -= sm.decay;
+
+          if (sm.alpha <= 0) {
+            this.smokes.splice(i, 1);
+            continue;
+          }
+
+          this.ctx.save();
+          this.ctx.globalAlpha = sm.alpha;
+          this.ctx.fillStyle = "#94a3b8";
+          this.ctx.beginPath();
+          this.ctx.arc(sm.x, sm.y, sm.radius, 0, Math.PI * 2);
+          this.ctx.fill();
+          this.ctx.restore();
+        }
+
+        if (this.petals.length > 0 || this.sparks.length > 0 || this.smokes.length > 0) {
+          this.animId = requestAnimationFrame(() => this.render());
+        } else {
+          cancelAnimationFrame(this.animId);
+          this.animId = null;
+        }
+      }
+    }
+
+    /* =========================================================================
+     * MICROPHONE BLOW DETECTION SENSOR
+     * ========================================================================= */
+    class MicrophoneBlowSensor {
+      constructor(onBlowDetected) {
+        this.onBlow = onBlowDetected;
+        this.stream = null;
+        this.audioCtx = null;
+        this.analyser = null;
+        this.active = false;
+      }
+
+      async startListening() {
+        if (this.active) return;
+        try {
+          this.stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          this.audioCtx = new AudioContextClass();
+          const source = this.audioCtx.createMediaStreamSource(this.stream);
+          this.analyser = this.audioCtx.createAnalyser();
+          this.analyser.fftSize = 256;
+          source.connect(this.analyser);
+
+          this.active = true;
+          this.pollAudio();
+          document.getElementById("blow-status-text").textContent = "🎙️ Mic active: Huyopa na ang imong screen!";
+        } catch (err) {
+          document.getElementById("blow-status-text").textContent = "💨 I-tap o i-klik ang kalayo aron mapalong!";
+        }
+      }
+
+      pollAudio() {
+        if (!this.active) return;
+        const buffer = new Float32Array(this.analyser.fftSize);
+        this.analyser.getFloatTimeDomainData(buffer);
+
+        let sum = 0;
+        for (let i = 0; i < buffer.length; i++) sum += buffer[i] * buffer[i];
+        const rms = Math.sqrt(sum / buffer.length);
+
+        if (rms > 0.18) {
+          this.active = false;
+          this.stop();
+          this.onBlow();
+          return;
+        }
+        requestAnimationFrame(() => this.pollAudio());
+      }
+
+      stop() {
+        if (this.stream) {
+          this.stream.getTracks().forEach(t => t.stop());
+        }
+        if (this.audioCtx) {
+          this.audioCtx.close();
+        }
+        this.active = false;
+      }
+    }
+
+    /* =========================================================================
+     * APPLICATION CONTROLLER & INTEGRATED SOUND EVENT HOOKS
+     * ========================================================================= */
+    const particleEngine = new HybridParticleEngine("visual-canvas");
+    const audioEngine = new ReactiveAudioEngine();
+    const cardEl = document.getElementById("interactive-card");
+    const flameEl = document.getElementById("candle-flame");
+
+    // Photo Carousel
+    let currentPhotoIdx = 0;
+    const photoEl = document.getElementById("celebrant-photo");
+    const captionEl = document.getElementById("photo-caption");
+
+    function setPhoto(idx) {
+      photoEl.style.opacity = "0";
+      setTimeout(() => {
+        photoEl.src = CONFIG.photoGallery[idx].url;
+        captionEl.textContent = CONFIG.photoGallery[idx].caption;
+        photoEl.style.opacity = "1";
+      }, 250);
+    }
+    setPhoto(0);
+
+    const nextPhoto = () => {
+      sfxEngine.playBubblePop(); // Tactile Pop Sound!
+      currentPhotoIdx = (currentPhotoIdx + 1) % CONFIG.photoGallery.length;
+      setPhoto(currentPhotoIdx);
+    };
+
+    document.getElementById("btn-next-photo").addEventListener("click", (e) => {
+      nextPhoto();
+      const rect = e.target.getBoundingClientRect();
+      particleEngine.spawnHeartFireworks(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    });
+
+    document.getElementById("photo-frame-trigger").addEventListener("click", nextPhoto);
+
+    // Celebration Shower (Sparkle Chime Sound!)
+    document.getElementById("btn-shower").addEventListener("click", (e) => {
+      sfxEngine.playSparkleChime();
+      const rect = e.target.getBoundingClientRect();
+      particleEngine.spawnPetals(85);
+      particleEngine.spawnHeartFireworks(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    });
+
+    document.getElementById("btn-celebrate-video").addEventListener("click", (e) => {
+      sfxEngine.playSparkleChime();
+      const rect = e.target.getBoundingClientRect();
+      particleEngine.spawnPetals(85);
+      particleEngine.spawnHeartFireworks(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    });
+
+    // Melody Trigger
+    document.getElementById("btn-music").addEventListener("click", () => {
+      sfxEngine.playBubblePop();
+      videoEl.pause();
+      audioEngine.playFullSong();
+      particleEngine.spawnPetals(40);
+    });
+
+    // Wish Mode Flip (Magical Shimmer Sound!)
+    let blowSensor = null;
+    let candleBlown = false;
+
+    const extinguishCandle = () => {
+      if (candleBlown) return;
+      candleBlown = true;
+      flameEl.classList.add("extinguished");
+
+      sfxEngine.playCelebrationFanfare(); // Triumphant Fanfare Sound!
+
+      const rect = flameEl.getBoundingClientRect();
+      particleEngine.spawnSmoke(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      particleEngine.spawnHeartFireworks(window.innerWidth / 2, window.innerHeight * 0.4);
+      particleEngine.spawnPetals(90);
+
+      document.getElementById("blow-status-text").textContent = "✨ Napalong na ang kandila! Wish granted! ✨";
+      setTimeout(() => audioEngine.playFullSong(), 300);
+    };
+
+    blowSensor = new MicrophoneBlowSensor(extinguishCandle);
+
+    document.getElementById("btn-flip-wish").addEventListener("click", () => {
+      sfxEngine.playMagicShimmer();
+      cardEl.classList.add("is-flipped");
+      candleBlown = false;
+      flameEl.classList.remove("extinguished");
+      document.getElementById("blow-status-text").textContent = "💨 Huyopa ang mic sa phone o i-tap ang kandila!";
+      blowSensor.startListening();
+    });
+
+    document.getElementById("candle-trigger").addEventListener("click", extinguishCandle);
+
+    document.getElementById("btn-return").addEventListener("click", () => {
+      sfxEngine.playBubblePop();
+      cardEl.classList.remove("is-flipped");
+      if (blowSensor) blowSensor.stop();
+    });
+
+    // Pointer Trail
+    window.addEventListener("mousemove", (e) => {
+      particleEngine.spawnPointerDust(e.clientX, e.clientY);
+    });
+    window.addEventListener("touchmove", (e) => {
+      if (e.touches.length > 0) {
+        particleEngine.spawnPointerDust(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    });
+
+    // Gyroscope Parallax
+    window.addEventListener("deviceorientation", (e) => {
+      if (e.gamma !== null && e.beta !== null) {
+        const xRot = Math.min(Math.max((e.beta - 45) * 0.4, -15), 15);
+        const yRot = Math.min(Math.max(e.gamma * 0.4, -15), 15);
+        cardEl.style.transform = cardEl.classList.contains("is-flipped") 
+          ? `rotateY(180deg) rotateX(${xRot}deg)` 
+          : `rotateX(${xRot}deg) rotateY(${yRot}deg)`;
+      }
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      particleEngine.spawnPetals(40);
+    });
+  </script>
+</body>
+</html>
